@@ -1,7 +1,15 @@
 import React from 'react';
 
-export const Badge = ({ children, variant = 'default', className = '' }) => {
-  const variants = {
+type BadgeVariant = 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info';
+
+interface BadgeProps {
+  children: React.ReactNode;
+  variant?: BadgeVariant;
+  className?: string;
+}
+
+export const Badge: React.FC<BadgeProps> = ({ children, variant = 'default', className = '' }) => {
+  const variants: Record<BadgeVariant, string> = {
     default: 'bg-gray-100 text-gray-800',
     primary: 'bg-primary-100 text-primary-800',
     success: 'bg-green-100 text-green-800',

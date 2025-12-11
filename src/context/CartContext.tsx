@@ -1,10 +1,26 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { Product, CartItem } from '../types';
 
-const CartContext = createContext(null);
+interface CartContextType {
+  cart: CartItem[];
+  loading: boolean;
+  addToCart: (product: Product, quantity?: number) => void;
+  removeFromCart: (productId: string) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
+  clearCart: () => void;
+  getCartTotal: () => number;
+  getCartItemsCount: () => number;
+}
 
-export const CartProvider = ({ children }) => {
-  const [cart, setCart] = useState([]);
-  const [loading, setLoading] = useState(false);
+const CartContext = createContext<CartContextType | null>(null);
+
+interface CartProviderProps {
+  children: ReactNode;
+}
+
+export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -19,7 +35,7 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
-  const addToCart = (product, quantity = 1) => {
+  const addToCart = (product: Product, quantity: number = 1): void => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((item) => item.id === product.id);
       
@@ -35,11 +51,11 @@ export const CartProvider = ({ children }) => {
     });
   };
 
-  const removeFromCart = (productId) => {
+  const removeFromCart = (productId: string): void => {
     setCart((prevCart) => prevCart.filter((item) => item.id !== productId));
   };
 
-  const updateQuantity = (productId, quantity) => {
+  const updateQuantity = (productId: string, quantity: number): void => {
     if (quantity <= 0) {
       removeFromCart(productId);
       return;
@@ -52,15 +68,15 @@ export const CartProvider = ({ children }) => {
     );
   };
 
-  const clearCart = () => {
+  const clearCart = (): void => {
     setCart([]);
   };
 
-  const getCartTotal = () => {
+  const getCartTotal = (): number => {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
-  const getCartItemsCount = () => {
+  const getCartItemsCount = (): number => {
     return cart.reduce((count, item) => count + item.quantity, 0);
   };
 

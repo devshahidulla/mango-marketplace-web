@@ -1,11 +1,25 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authService } from '../services';
+import { User, LoginCredentials, RegisterData, AuthResponse } from '../types';
 
-const AuthContext = createContext(null);
+interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+  login: (credentials: LoginCredentials) => Promise<AuthResponse>;
+  register: (userData: RegisterData) => Promise<AuthResponse>;
+  logout: () => void;
+  isAuthenticated: boolean;
+}
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+const AuthContext = createContext<AuthContextType | null>(null);
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     // Check if user is logged in on mount
@@ -26,7 +40,7 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  const login = async (credentials) => {
+  const login = async (credentials: LoginCredentials): Promise<AuthResponse> => {
     try {
       const data = await authService.login(credentials);
       setUser(data.user);
@@ -36,7 +50,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (userData) => {
+  const register = async (userData: RegisterData): Promise<AuthResponse> => {
     try {
       const data = await authService.register(userData);
       setUser(data.user);
