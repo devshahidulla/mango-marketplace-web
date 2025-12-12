@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, User, Search, Menu, X } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { Button } from '../common/Button';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const { isAuthenticated } = useAuth();
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
@@ -46,9 +49,24 @@ export const Header = () => {
                 0
               </span>
             </Link>
-            <Link to="/profile">
-              <User className="h-6 w-6 text-gray-700 hover:text-primary transition" />
-            </Link>
+            {!isAuthenticated ? (
+              <>
+                <Link to="/login">
+                  <Button variant="outline" size="sm">
+                    Login
+                  </Button>
+                </Link>
+                <Link to="/register">
+                  <Button variant="primary" size="sm">
+                    Register
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <Link to="/profile">
+                <User className="h-6 w-6 text-gray-700 hover:text-primary transition" />
+              </Link>
+            )}
           </nav>
 
           {/* Mobile Menu Button */}
@@ -98,13 +116,28 @@ export const Header = () => {
               >
                 Cart (0)
               </Link>
-              <Link
-                to="/profile"
-                className="text-gray-700 hover:text-primary transition"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Profile
-              </Link>
+              {!isAuthenticated ? (
+                <>
+                  <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="outline" size="md" className="w-full">
+                      Login
+                    </Button>
+                  </Link>
+                  <Link to="/register" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="primary" size="md" className="w-full">
+                      Register
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                <Link
+                  to="/profile"
+                  className="text-gray-700 hover:text-primary transition"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Profile
+                </Link>
+              )}
             </nav>
           </div>
         )}
