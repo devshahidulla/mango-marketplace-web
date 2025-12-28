@@ -1,4 +1,5 @@
 import api from './api';
+import { userService } from './userService';
 import { Product, ProductQueryParams, LoginCredentials, RegisterData, AuthResponse, User, CartItem, Category } from '../types';
 
 export const productService = {
@@ -39,11 +40,8 @@ export const authService = {
 
   // Register
   register: async (userData: RegisterData): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/auth/register', userData);
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-    }
-    return response.data;
+    const response = await userService.registerUser(userData);
+    return response;
   },
 
   // Logout
@@ -103,3 +101,6 @@ export const categoryService = {
     return response.data;
   },
 };
+
+// Export userService for direct access if needed
+export { userService };
