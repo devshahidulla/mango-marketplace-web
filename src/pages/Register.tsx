@@ -80,15 +80,16 @@ const Register = () => {
       
       // Registration successful, redirect to home page
       navigate('/');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Registration error:', error);
       
       // Handle API errors
-      if (error.response?.data?.message) {
-        setErrors({ general: error.response.data.message });
-      } else if (error.response?.data?.errors) {
+      const axiosError = error as { response?: { data?: { message?: string; errors?: Record<string, string> } } };
+      if (axiosError.response?.data?.message) {
+        setErrors({ general: axiosError.response.data.message });
+      } else if (axiosError.response?.data?.errors) {
         // Handle validation errors from API
-        setErrors(error.response.data.errors);
+        setErrors(axiosError.response.data.errors);
       } else {
         setErrors({ general: 'Registration failed. Please try again.' });
       }
