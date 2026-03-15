@@ -7,7 +7,7 @@ import { Button } from '../common/Button';
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
@@ -63,9 +63,20 @@ export const Header = () => {
                 </Link>
               </>
             ) : (
-              <Link to="/profile">
-                <User className="h-6 w-6 text-gray-700 hover:text-primary transition" />
-              </Link>
+              <div className="flex items-center space-x-4">
+                <Link to="/profile" className="flex items-center space-x-2 text-gray-700 hover:text-primary transition">
+                  <User className="h-5 w-5" />
+                  <span className="text-sm font-medium">
+                    {user?.firstName} {user?.lastName}
+                  </span>
+                </Link>
+                <button
+                  onClick={logout}
+                  className="text-sm text-gray-500 hover:text-red-500 transition"
+                >
+                  Logout
+                </button>
+              </div>
             )}
           </nav>
 
@@ -130,13 +141,22 @@ export const Header = () => {
                   </Link>
                 </>
               ) : (
-                <Link
-                  to="/profile"
-                  className="text-gray-700 hover:text-primary transition"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Profile
-                </Link>
+                <>
+                  <Link
+                    to="/profile"
+                    className="flex items-center space-x-2 text-gray-700 hover:text-primary transition"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <User className="h-5 w-5" />
+                    <span>{user?.firstName} {user?.lastName}</span>
+                  </Link>
+                  <button
+                    onClick={() => { logout(); setIsMenuOpen(false); }}
+                    className="text-left text-gray-500 hover:text-red-500 transition"
+                  >
+                    Logout
+                  </button>
+                </>
               )}
             </nav>
           </div>

@@ -22,22 +22,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Check if user is logged in on mount
-    const checkAuth = async () => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        try {
-          const userData = await authService.getCurrentUser();
-          setUser(userData);
-        } catch (error) {
-          console.error('Auth check failed:', error);
-          localStorage.removeItem('token');
-        }
+    // Restore user from stored token on mount
+    const token = localStorage.getItem('token');
+    if (token) {
+      const userData = authService.getCurrentUser();
+      if (userData) {
+        setUser(userData);
+      } else {
+        localStorage.removeItem('token');
       }
-      setLoading(false);
-    };
-
-    checkAuth();
+    }
+    setLoading(false);
   }, []);
 
   const login = async (credentials: LoginCredentials): Promise<AuthResponse> => {

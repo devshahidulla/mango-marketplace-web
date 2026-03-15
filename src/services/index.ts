@@ -31,11 +31,7 @@ export const productService = {
 export const authService = {
   // Login
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/auth/login', credentials);
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-    }
-    return response.data;
+    return await userService.loginUser(credentials);
   },
 
   // Register
@@ -49,10 +45,9 @@ export const authService = {
     localStorage.removeItem('token');
   },
 
-  // Get current user
-  getCurrentUser: async (): Promise<User> => {
-    const response = await api.get<User>('/auth/me');
-    return response.data;
+  // Get current user from stored token
+  getCurrentUser: (): User | null => {
+    return userService.getCurrentUser();
   },
 };
 

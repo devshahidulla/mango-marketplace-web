@@ -1,26 +1,81 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 
 const Login = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+    if (errors[e.target.name]) {
+      setErrors({
+        ...errors,
+        [e.target.name]: '',
+      });
+    }
   };
 
-  const handleSubmit = (e) => {
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
+    }
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Add validation and API call here
-    console.log('Login:', formData);
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+    setErrors({});
+
+    try {
+      await login({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      navigate('/');
+    } catch (error: unknown) {
+      console.error('Login error:', error);
+
+      const axiosError = error as { response?: { status?: number; data?: { message?: string; errors?: Record<string, string> } } };
+      if (axiosError.response?.status === 401) {
+        setErrors({ general: 'Invalid email or password.' });
+      } else if (axiosError.response?.data?.message) {
+        setErrors({ general: axiosError.response.data.message });
+      } else if (axiosError.response?.data?.errors) {
+        setErrors(axiosError.response.data.errors);
+      } else {
+        setErrors({ general: 'Login failed. Please try again.' });
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -33,6 +88,12 @@ const Login = () => {
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-8">
+          {errors.general && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
+              {errors.general}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <Input
               label="Email Address"
@@ -66,8 +127,8 @@ const Login = () => {
               </Link>
             </div>
 
-            <Button type="submit" className="w-full" size="lg">
-              Sign In
+            <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+              {isLoading ? 'Signing In...' : 'Sign In'}
             </Button>
           </form>
 

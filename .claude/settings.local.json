@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(ls -la /c/Projects/mango-platform/mango-marketplace-web/.env*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(npx tsc:*)",
+      "Bash(npx vite:*)",
+      "Bash(find /c/Projects/mango-platform -type f \\\\\\(-name README.md -o -name *.md -o -name ARCHITECTURE* -o -name *API* \\\\\\) ! -path */node_modules/* ! -path */.git/* ! -path */bin/* ! -path */obj/*)"
+    ]
+  }
+}
